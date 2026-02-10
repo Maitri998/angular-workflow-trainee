@@ -1,0 +1,21 @@
+<div class = "workflow-list">
+  <h2>Workflows (Total: {{workflows.length}})</h2>
+  <div 
+  class="workflow-item"
+  *ngFor="let workflow of workflows;
+   trackBy: trackByWorkflowId"
+  (click)= "onWorkflowClick(workflow.id)">
+    <div> 
+      <strong> ID: </strong> {{workflow.id}} 
+    </div>
+    <div>
+      <strong> Title: </strong> {{workflow.title}} 
+    </div>
+    <div>
+      <strong> Status: </strong> {{workflow.status}} 
+    </div>
+    <div>
+      <strong> Date: </strong> {{workflow.date}} 
+    </div>
+  </div>
+</div>

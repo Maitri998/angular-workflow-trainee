@@ -1,0 +1,26 @@
+.workflow-list {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
+
+.workflow-item {
+  padding: 20px;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.workflow-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.workflow-item div {
+  margin: 8px 0;
+  font-size: 11px;
+}

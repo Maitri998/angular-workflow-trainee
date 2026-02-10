@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+h1 {
+  color: #3d22b6;
+  padding: 20px;
+  margin: 0;
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #13bdc3;
+}
