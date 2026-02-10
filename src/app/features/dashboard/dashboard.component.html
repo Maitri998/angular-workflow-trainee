@@ -1,1 +1,68 @@
-<p>dashboard works!</p>
+<section class="page">
+  <h1>Admin Workflows</h1>
+
+  <form class="wf-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="grid">
+      <label>
+        <span>Title</span>
+        <input type="text" formControlName="title" placeholder="Enter workflow title" />
+        <small class="error" *ngIf="form.controls.title.touched && form.controls.title.invalid">
+          Title is required.
+        </small>
+      </label>
+
+      <label>
+        <span>Status</span>
+        <select formControlName="status">
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </label>
+    </div>
+
+    <label class="block">
+      <span>Description</span>
+      <textarea formControlName="description" rows="3" placeholder="Describe the workflow"></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="submit" [disabled]="form.invalid">
+        {{ editingId === null ? 'Create Workflow' : 'Save Changes' }}
+      </button>
+      <button type="button" *ngIf="editingId !== null" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </form>
+
+  <hr />
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Title</th>
+          <th style="width: 160px;">Status</th>
+          <th style="width: 180px;">Created</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let w of (workflows$ | async) ?? []; trackBy: trackById"
+          (click)="onSelectWorkflow(w.id)"
+          (dblclick)="onRowDblClick(w)"
+          class="row">
+          <td class="mono">#{{ w.id }}</td>
+          <td>{{ w.title }}</td>
+          <td>{{ w.status }}</td>
+          <td>{{ w.createdAt | date:'medium' }}</td>
+        </tr>
+
+        <tr *ngIf="((workflows$ | async) ?? []).length === 0">
+          <td colspan="4" class="empty">No workflows found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
