@@ -1,8 +1,9 @@
 import { Component} from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { WorkflowList } from './workflows/workflow-list/workflow-list';
+import { WorkflowService } from './workflows/workflow.service';
 import { Workflow } from './workflows/workflow.model';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -12,19 +13,16 @@ import { Workflow } from './workflows/workflow.model';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
+
+
 export class App {
-  workflows: Workflow[] = []; //here it starts empty, filled after HTTP call completes//
+  workflows$!: Observable<Workflow[]>; //This property is an Observable that will hold an array of Workflow objects. The $ suffix is a common convention to indicate that this property is an Observable.//
   
-  constructor(private http: HttpClient) {
-    this.loadWorkflows();
-  } //the constructor runs when the component is created, and it calls loadWorkflows to fetch the data from the JSON file.//
-  
-  loadWorkflows(): void {
-    this.http.get<Workflow[]> ('assets/workflows.json') //HTTP GET request is called here to fetch workflows.json
-    .subscribe(data => { //subscribe runs when the HTTP request completes, and it receives the data from the JSON file.//
-      this.workflows = data;
-    });
+  constructor(private workflowService: WorkflowService) {
+    this.workflows$ = this.workflowService.getWorkflows();
+     //In the constructor, the WorkflowService is injected, and the getWorkflows() method is called to assign the Observable of workflows to the workflows$ property.//
   }
+
  onWorkflowSelected(id: number): void { //This method is called when a workflow is selected in the WorkflowList component. It receives the ID of the selected workflow as a parameter and logs it to the console.//
     console.log('Selected Workflow ID:', id);
  }
