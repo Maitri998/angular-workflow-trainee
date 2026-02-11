@@ -1,12 +1,15 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Workflow } from '../workflow.model';
+import { RouterModule } from '@angular/router';
+import { WorkflowService } from '../workflow.service';
+import { Observable } from 'rxjs';
 
 
 @Component({
   selector: 'app-workflow-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './workflow-list.html',
   styleUrl: './workflow-list.css',
 
@@ -18,11 +21,13 @@ import { Workflow } from '../workflow.model';
 })
 
 export class WorkflowList {
-  @Input() workflows: Workflow[] = []; // Input property to receive the list of workflows from the parent component//
-  @Output() workflowSelected = new EventEmitter<number>(); // Output event emitter to notify the parent component when a workflow is selected//
-onWorkflowClick(workflowId: number): void {
-  this.workflowSelected.emit(workflowId); // Emit the selected workflow ID to the parent component//
-}
+  workflows$!: Observable<Workflow[]>; // Observable to hold the list of workflows
+
+  constructor(private workflowService: WorkflowService)
+   {
+    this.workflows$ = this.workflowService.getWorkflows(); // Fetch workflows from the service
+   }
+
 trackByWorkflowId(index: number, workflow: Workflow): number {
   return workflow.id; // TrackBy function to optimize rendering by tracking workflows by their unique ID//
 }
