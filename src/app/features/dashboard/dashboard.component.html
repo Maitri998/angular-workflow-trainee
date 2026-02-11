@@ -1,5 +1,8 @@
+
+
 <section class="page">
   <h1>Admin Workflows</h1>
+
 
   <form class="wf-form" [formGroup]="form" (ngSubmit)="submit()">
     <div class="grid">
@@ -7,7 +10,7 @@
         <span>Title</span>
         <input type="text" formControlName="title" placeholder="Enter workflow title" />
         <small class="error" *ngIf="form.controls.title.touched && form.controls.title.invalid">
-          Title is required.
+          Title is required (min 3 chars).
         </small>
       </label>
 
@@ -27,7 +30,8 @@
     </label>
 
     <div class="actions">
-      <button type="submit" [disabled]="form.invalid">
+      <button type="submit" [disabled]="form.invalid || saving">
+        <span *ngIf="saving" class="btn-spinner" aria-hidden="true"></span>
         {{ editingId === null ? 'Create Workflow' : 'Save Changes' }}
       </button>
       <button type="button" *ngIf="editingId !== null" (click)="cancelEdit()">Cancel</button>
@@ -35,6 +39,7 @@
   </form>
 
   <hr />
+
 
   <div class="table-wrap">
     <table>
@@ -54,7 +59,11 @@
           (dblclick)="onRowDblClick(w)"
           class="row">
           <td class="mono">#{{ w.id }}</td>
-          <td>{{ w.title }}</td>
+          <td>
+            {{ w.title }}
+            
+            <span *ngIf="rowLoadingId === w.id" class="inline-spinner" aria-label="Loading"></span>
+          </td>
           <td>{{ w.status }}</td>
           <td>{{ w.createdAt | date:'medium' }}</td>
         </tr>
@@ -66,3 +75,4 @@
     </table>
   </div>
 </section>
+
