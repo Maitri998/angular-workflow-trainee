@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of, delay } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { Workflow } from '../models/workflow.model';
 
 @Injectable({ providedIn: 'root' })
@@ -10,7 +10,9 @@ export class WorkflowService {
   private readonly STORAGE_KEY = 'workflows';
   private readonly url = 'assets/workflows.json';
 
+
   private readonly _workflows$ = new BehaviorSubject<Workflow[]>([]);
+
   workflows$ = this._workflows$.asObservable();
 
   private initialized = false;
@@ -25,22 +27,25 @@ export class WorkflowService {
       return;
     }
 
-    this.http.get<Workflow[]>(this.url).subscribe({
-      next: (list) => {
-        this._workflows$.next(list);
-        this.persist();
-      },
-      error: (err) => {
-        console.error('Failed to load assets/workflows.json', err);
-        this._workflows$.next([]); 
-      }
-    });
+    this.http.get<Workflow[]>(this.url)
+      .pipe(delay(800)) 
+      .subscribe({
+        next: (list) => {
+          this._workflows$.next(list);
+          this.persist();
+        },
+        error: (err) => {
+          console.error('Failed to load assets/workflows.json', err);
+          this._workflows$.next([]); 
+        }
+      });
   }
 
   getById(id: number): Workflow | undefined {
     return this._workflows$.value.find(w => w.id === id);
   }
 
+  /** CREATE (sync) */
   add(draft: { title: string; status: Workflow['status']; description?: string }): Workflow {
     const newItem: Workflow = {
       id: this.nextId(),
@@ -54,13 +59,29 @@ export class WorkflowService {
     return newItem;
   }
 
+
   update(updated: Workflow): void {
     const next = this._workflows$.value.map(w => w.id === updated.id ? { ...updated } : w);
     this._workflows$.next(next);
     this.persist();
   }
 
+ 
+  add$(draft: { title: string; status: Workflow['status']; description?: string }, ms = 700) {
+    return of(true).pipe(
+      delay(ms),
+      tap(() => this.add(draft))
+    );
+  }
 
+  update$(updated: Workflow, ms = 700) {
+    return of(true).pipe(
+      delay(ms),
+      tap(() => this.update(updated))
+    );
+  }
+
+ 
   private persist(): void {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._workflows$.value));
   }
