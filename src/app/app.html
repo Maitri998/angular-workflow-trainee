@@ -1,17 +1,7 @@
 <h1>Workflow Management Application</h1>
 
-<div *ngIf="workflows$ | async as workflows; else loading">
- 
-<app-workflow-list
-    [workflows]= "workflows"
-    (workflowSelected)="onWorkflowSelected($event)">
-</app-workflow-list>
+<router-outlet></router-outlet>
 
-</div>
-
-<ng-template #loading>
-  <p>Loading workflows...</p>
-</ng-template>
 
 
 
