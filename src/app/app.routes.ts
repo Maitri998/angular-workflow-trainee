@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { WorkflowDetail } from './workflows/workflow-detail/workflow-detail';
 import { workflowResolver } from './workflows/workflow.resolver';
 
 export const routes: Routes = [
