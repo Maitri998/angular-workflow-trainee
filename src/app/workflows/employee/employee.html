@@ -1,0 +1,57 @@
+<div class="employee-container">
+
+  <h2 class="dashboard-title">Employee Dashboard</h2>
+
+  
+  <div class="filter-section">
+    <label>Filter by Status:</label>
+
+    <!-- Two-way binding with selectedFilter and triggers reload on change -->
+    <select [(ngModel)]="selectedFilter" (change)="onFilterChange()">
+      <option value="ALL">All</option>
+      <option value="NEW">New</option>
+      <option value="REQUESTED">Requested</option>
+      <option value="APPROVED">Approved</option>
+      <option value="REJECTED">Rejected</option>
+    </select>
+  </div>
+
+  <div *ngIf="workflows$ | async as workflows">
+
+    <div *ngIf="workflows.length === 0" class="empty-state">
+      No workflows available.
+    </div>
+
+
+   <!-- this will loop through workflows and render each as a card -->
+    <div *ngFor="let workflow of workflows" class="workflow-card">
+
+      <h4 class="workflow-title">{{ workflow.title }}</h4>
+
+      <p>
+        Status:
+        <span class="status-badge"
+              [ngClass]="'status-' + workflow.status.toLowerCase()">
+          {{ workflow.status }}
+        </span>
+      </p>
+
+      <p *ngIf="workflow.managerComments" class="comment">
+        <strong>Manager Comments:</strong>
+        {{ workflow.managerComments }}
+      </p>
+
+      <!-- request approval button for the 'NEW' workflows -->
+      <div *ngIf="workflow.status === 'NEW'" class="action-buttons">
+        <button
+          class="btn-primary"
+          (click)="requestApproval(workflow.id)">
+          Request Approval
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
