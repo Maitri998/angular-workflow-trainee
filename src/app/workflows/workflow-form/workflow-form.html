@@ -1,0 +1,20 @@
+<div class="form-container">
+  <div class="form-card">
+    <h2 class="form-title">Create New Workflow</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="workflow-form">
+
+      <div class="form-group">
+        <label>Title</label>
+        <input formControlName="title" />
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary">
+          Create Workflow
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
