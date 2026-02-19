@@ -1,26 +1,27 @@
 import { Routes } from '@angular/router';
-import { workflowResolver } from './workflows/workflow.resolver';
 
 export const routes: Routes = [
-{
-        path: '',
-        redirectTo: 'workflows',
-        pathMatch: 'full'
-    },
+
+      {
+         path: '',
+        redirectTo: 'login',
+        pathMatch: 'full' //ensures exact match of empty path
+     },
+
+  {
+
+    //Login Route (Lazy Loaded Component)
+    path: 'login',
+    loadComponent: () =>
+   import('./workflows/login/login').then(m => m.LoginComponent)
+  },
 
     {
+
+     // Workflows Feature Routes (Lazy Loaded)
         path: 'workflows',
-        loadComponent: () => import('./workflows/workflow-list/workflow-list').then(m => m.WorkflowList)
+        loadChildren: () =>
+        import('./workflows/workflow.routes').then(m => m.workflowRoutes)
     },
-    {
-        path: 'workflows/:id',
 
-         loadComponent: () => import('./workflows/workflow-detail/workflow-detail')
-         .then(m => m.WorkflowDetail),
-         resolve: {
-            workflow : workflowResolver
-    }
-}
-
-    
 ];
