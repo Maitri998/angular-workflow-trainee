@@ -1,8 +1,70 @@
-<div *ngIf="workflow">
+@if (workflow) {
 
-    <h2>{{ workflow.title }}</h2>
-    <p> ID: {{ workflow.id }}</p>
-    <p> Status: {{ workflow.status }}</p>
-    <p> Date: {{ workflow.date }}</p>
-    
-</div>
+  <div class="workflow-detail-container">
+
+ <!-- in the heading, kept the title and the status badge -->
+    <div class="detail-header">
+      <h2>{{ workflow.title }}</h2>
+  <span 
+  class="status-badge"
+  [ngClass]="getStatusClass(workflow.status)">
+  {{ workflow.status }}
+</span>
+
+    </div>
+
+    <div class="detail-body">
+
+      <div class="detail-row">
+        <span class="label">ID</span>
+        <span>{{ workflow.id }}</span>
+      </div>
+
+      <div class="detail-row">
+        <span class="label">Date</span>
+        <span>{{ workflow.date | date:'short' }}</span>
+      </div>
+
+      <!-- conditional manager's comment display -->
+      @if (workflow.managerComments) 
+      {
+        <div class="detail-row">
+          <span class="label">Manager Comments</span>
+          <span>{{ workflow.managerComments }}</span>
+        </div>
+      }
+
+    </div>
+
+    <!-- for NEW status when logged in as employee -->
+    @if (currentRole === 'Employee' && workflow.status === 'NEW')
+     {
+        <div class="action-section">
+        <h3>Employee Action</h3>
+        <button class="btn-primary" (click)="requestApproval()">Request Approval</button>
+      </div>
+      }
+
+   <!-- Approval workflow with comment textarea -->
+    @if (currentRole === 'Manager' && workflow.status === 'REQUESTED') {
+
+      <div class="action-section">
+        <h3>Manager Action</h3>
+
+        <label>Comment</label>
+        <textarea [(ngModel)]="managerComment" rows="4"></textarea>
+
+        <div class="button-group">
+          <button class="btn-success" (click)="approve()">Approve</button>
+          <button class="btn-danger" (click)="reject()">Reject</button>
+        </div>
+      </div>
+        }
+
+  </div>
+
+}
+ @else
+  {
+       <p>Loading workflow details...</p>
+   }
