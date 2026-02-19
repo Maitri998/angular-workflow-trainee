@@ -1,28 +1,39 @@
-<div class = "workflow-list" *ngIf="workflows$ | async as workflows">
-  <h2>Workflows (Total: {{workflows.length}})</h2>
-  <div 
-  class="workflow-item"
-  *ngFor="let workflow of workflows;
-   trackBy: trackByWorkflowId"
- >
+<div class="workflow-list" *ngIf="workflows$ | async as workflows">
 
-  <a class="workflow-link"
-   [routerLink]="[workflow.id]">
+  <!-- header with dynamic count -->
+  <h2>Workflows (Total: {{ workflows.length }})</h2> 
 
-    <div> 
-      <strong> ID: </strong> {{workflow.id}} 
+<div class="workflow-item" *ngFor="let workflow of workflows; trackBy: trackByWorkflowId">
+
+  <!-- this router link will lead to workflow detail -->
+  <a class="workflow-link" [routerLink]="['/workflows', workflow.id]"> 
+
+    <div class="workflow-field id">
+      <span class="label">ID</span>
+      <span>{{ workflow.id }}</span>
     </div>
-    <div>
-      <strong> Title: </strong> {{workflow.title}} 
+
+    <div class="workflow-field title">
+      <span class="label">Title</span>
+      <span>{{ workflow.title }}</span>
     </div>
-    <div>
-      <strong> Status: </strong> {{workflow.status}} 
+
+    <div class="workflow-field status">
+      <span class="label">Status</span>
+      <span class="status-badge">{{ workflow.status }}</span>
     </div>
-    <div>
-      <strong> Date: </strong> {{workflow.date}} 
+
+    <div class="workflow-field date">
+      <span class="label">Date</span>
+      <span>{{ workflow.date }}</span>
     </div>
 
   </a>
-  
+ <!-- only admin can delete the created workflows -->
+  <div class="workflow-actions" *ngIf="auth.getRole() === 'Admin'">
+    <button class="btn-danger" (click)="delete(workflow.id)">Delete</button>
   </div>
+
+</div>
+
 </div>
