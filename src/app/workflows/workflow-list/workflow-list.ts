@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Workflow } from '../workflow.model';
 import { RouterModule } from '@angular/router';
-import { WorkflowService } from '../workflow.service';
 import { Observable } from 'rxjs';
-
+import { Workflow } from '../workflow.model';
+import { WorkflowService } from '../workflow.service';
+import { AuthService } from '../../auth.service';
 
 @Component({
   selector: 'app-workflow-list',
@@ -12,24 +12,47 @@ import { Observable } from 'rxjs';
   imports: [CommonModule, RouterModule],
   templateUrl: './workflow-list.html',
   styleUrl: './workflow-list.css',
-
-  // Using OnPush change detection strategy for better
-  //  performance so that Angular skips checking a component
-  //  and its children unless specific conditions are met.// 
   changeDetection: ChangeDetectionStrategy.OnPush
-
 })
-
 export class WorkflowList {
-  workflows$!: Observable<Workflow[]>; // Observable to hold the list of workflows
 
-  constructor(private workflowService: WorkflowService)
+  workflows$!: Observable<Workflow[]>;
+
+  constructor(
+    private workflowService: WorkflowService,
+    public auth: AuthService // public because template uses it
+  )
    {
-    this.workflows$ = this.workflowService.getWorkflows(); // Fetch workflows from the service
-   }
+    const role = this.auth.getRole() as 'Employee' | 'Manager' | 'Admin';
 
-trackByWorkflowId(index: number, workflow: Workflow): number {
-  return workflow.id; // TrackBy function to optimize rendering by tracking workflows by their unique ID//
-}
+    this.workflows$ = this.workflowService.getWorkflowsByRole(role);
+  }
 
+  trackByWorkflowId(index: number, workflow: Workflow): number
+   {
+    return workflow.id;
+  }
+ //Manager scope of work-
+
+  approve(id: number): void
+   {
+    this.workflowService.updateWorkflowStatus(
+      id,
+      'APPROVED',
+      'Approved by manager'
+    );
+  }
+
+  reject(id: number): void {
+    this.workflowService.updateWorkflowStatus(
+      id,
+      'REJECTED',
+      'Rejected by manager'
+    );
+  }
+       //admin scope of work-
+  
+  delete(id: number): void {
+    this.workflowService.deleteWorkflow(id);
+  }
 }
