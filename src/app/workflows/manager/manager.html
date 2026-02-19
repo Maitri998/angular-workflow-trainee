@@ -1,0 +1,55 @@
+<div class="manager-container">
+
+  <h2 class="dashboard-title">Manager Dashboard</h2>
+
+  <div class="filter-section">
+    <label>Filter by Status:</label>
+    <select [(ngModel)]="selectedFilter" (change)="onFilterChange()">
+      <option value="ALL">All</option>
+      <option value="REQUESTED">Requested</option>
+      <option value="APPROVED">Approved</option>
+      <option value="REJECTED">Rejected</option>
+    </select>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- async pipe workflows rendering -->
+  <div *ngIf="workflows$ | async as workflows"> 
+
+    <!-- this will be shown when no workflows matches the STATUS  -->
+    <div *ngIf="workflows.length === 0" class="empty-state">
+      No workflows found.
+    </div>
+
+    <div *ngFor="let workflow of workflows" class="workflow-card">
+
+      <h4 class="workflow-title">{{ workflow.title }}</h4>
+
+      <p>
+        Status:
+        <span class="status-badge"
+              [ngClass]="'status-' + workflow.status.toLowerCase()">
+          {{ workflow.status }}
+        </span>
+      </p>
+
+      <p *ngIf="workflow.managerComments" class="comment">
+        <strong>Manager Comments:</strong>
+        {{ workflow.managerComments }}
+      </p>
+
+      <div *ngIf="workflow.status === 'REQUESTED'" class="action-buttons">
+        <button class="btn-success" (click)="approve(workflow.id)">
+          Approve
+        </button>
+        <button class="btn-danger" (click)="reject(workflow.id)">
+          Reject
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
