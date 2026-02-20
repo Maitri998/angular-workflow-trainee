@@ -1,1 +1,121 @@
-<p>dashboard works!</p>
+<section class="page">
+  <header class="topbar" *ngIf="user$ | async as user">
+    <div class="who">
+      <strong>{{ user.name }}</strong> · <em>{{ user.role | uppercase }}</em>
+    </div>
+    <button (click)="logout()">Logout</button>
+  </header>
+
+  <h1>Workflows</h1>
+
+  <!-- FORM for Admin/Employee only -->
+  <ng-container *ngIf="(canCreateWorkflow$ | async) && (user$ | async) as user">
+    <form class="wf-form" [formGroup]="form" (ngSubmit)="submit(user)">
+      <div class="grid">
+        <label>
+          <span>Title</span>
+          <input type="text" formControlName="title" placeholder="Enter workflow title" />
+          <small class="error" *ngIf="form.controls.title.touched && form.controls.title.invalid">
+            Title is required (min 3 chars).
+          </small>
+        </label>
+
+        <!-- Admin can choose status, Employee gets pending -->
+        <label *ngIf="user.role === 'admin'">
+          <span>Status</span>
+          <select formControlName="status">
+            <option value="pending">Pending</option>
+            <option value="inprogress">In Progress</option>
+            <option value="rejected">Rejected</option>
+            <option value="approved">Approved</option>
+          </select>
+        </label>
+      </div>
+
+      <label class="block">
+        <span>Description</span>
+        <textarea formControlName="description" rows="3" placeholder="Describe the workflow"></textarea>
+      </label>
+
+      <div class="actions">
+        <button type="submit" [disabled]="form.invalid">
+          {{ editingId === null ? 'Create Workflow' : 'Update Workflow' }}
+        </button>
+        <button type="button" *ngIf="editingId !== null" (click)="cancelEdit()">Cancel</button>
+      </div>
+    </form>
+  </ng-container>
+
+  <hr />
+
+  <!-- TABLE -->
+  <div class="table-wrap" *ngIf="user$ | async as user">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Title</th>
+          <th style="width: 140px;">Status</th>
+          <th style="width: 180px;">Created</th>
+          <th style="width: 220px;" *ngIf="(isManager$ | async) || (isAdmin$ | async)">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- Main workflow rows -->
+        <tr
+          *ngFor="let w of (workflows$ | async) ?? []; trackBy: trackById"
+          (click)="onSelectWorkflow(w.id)"
+          (dblclick)="onRowDblClick(user, w)"
+          class="row"
+          [ngClass]="'status-' + w.status">
+          <td class="mono">#{{ w.id }}</td>
+          <td>{{ w.title }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="'status-' + w.status">
+              {{ w.status | titlecase }}
+            </span>
+          </td>
+          <td>{{ w.createdAt | date:'medium' }}</td>
+
+          <!-- EMPLOYEE ACTIONS -->
+          <td *ngIf="user.role === 'employee' && w.status === 'pending'">
+            <button (click)="sendToManager(w, user); $event.stopPropagation()" class="btn-primary">
+              Send to Manager
+            </button>
+          </td>
+
+          <!-- MANAGER ACTIONS -->
+          <td *ngIf="user.role === 'manager' && w.status === 'inprogress'">
+            <button (click)="approveWorkflow(w, user); $event.stopPropagation()" class="btn-success">
+              Approve
+            </button>
+            <button (click)="rejectWorkflow(w, user); $event.stopPropagation()" class="btn-danger">
+              Reject
+            </button>
+          </td>
+
+          <!-- ADMIN ACTIONS (can approve/reject any inprogress) -->
+          <td *ngIf="user.role === 'admin' && w.status === 'inprogress'">
+            <button (click)="approveWorkflow(w, user); $event.stopPropagation()" class="btn-success">
+              Approve
+            </button>
+            <button (click)="rejectWorkflow(w, user); $event.stopPropagation()" class="btn-danger">
+              Reject
+            </button>
+          </td>
+
+          <!-- Empty cell for statuses where no action is needed -->
+          <td *ngIf="user.role !== 'employee' && w.status !== 'inprogress' && w.status !== 'pending'">
+            —
+          </td>
+        </tr>
+
+        <!-- Empty state -->
+        <tr *ngIf="((workflows$ | async) ?? []).length === 0">
+          <td colspan="5" class="empty">No workflows found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
