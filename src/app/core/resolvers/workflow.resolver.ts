@@ -20,10 +20,7 @@ export class WorkflowResolver implements Resolve<Workflow[]> {
     _route: ActivatedRouteSnapshot,
     _state: RouterStateSnapshot
   ): Observable<Workflow[]> {
-    // Initialize the service
     this.workflowService.init();
-    return this.workflowService.workflows$.pipe(
-      map(workflows => workflows)
-    );
+    return this.workflowService.workflows$;
   }
 }
